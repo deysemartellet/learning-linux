@@ -17,6 +17,7 @@ Identificar processos suspeitos, malware ou execução não autorizada.
 #### Exemplo
 ```bash
 ps aux
+```
 
 O que observar
 Processos desconhecidos
