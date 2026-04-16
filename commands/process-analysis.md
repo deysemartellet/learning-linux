@@ -18,11 +18,16 @@ Identificar processos suspeitos, malware ou execução não autorizada.
 ```bash
 ps aux
 ```
+### 🔗 Conexão com outros comandos
 
-O que observar
-Processos desconhecidos
-Execução como root
-Alto uso de CPU/memória
+O PID identificado aqui pode ser investigado com:
+- netstat / ss (para ver conexões)
+
+**O que observar**
+
+- Processos desconhecidos
+- Execução como root
+- Alto uso de CPU/memória
 
 ## 🧪 Mini cenário
 
@@ -32,3 +37,10 @@ Durante uma investigação, foi identificado alto uso de CPU.
 1. Executar `ps aux`
 2. Identificar processo suspeito
 3. Investigar PID
+
+//When you do ps aux, pay attention to:
+USER
+PID
+%CPU
+%MEM
+COMMAND
