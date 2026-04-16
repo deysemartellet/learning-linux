@@ -49,17 +49,20 @@ tcp        0    256 192.168.1.10:44321      45.79.12.11:80          ESTABLISHED 
 ```
 
 #### Investigação de PID
-**Escuta (LISTEN)**: Na linha do **PID 3122**, o comando `nc` (netcat) está abrindo a porta **6666**. Isso geralmente indica que alguém abriu uma brecha para entrar no sistema a qualquer momento.
-**Execução como Root**: Ao rodar com `sudo`, percebe-se que o processo 3125 é apenas um `sh` (shell). Um shell (`sh` ou `bash`) estabelecendo uma conexão de rede (`ESTABLISHED`) é um sinal clássico de **Reverse Shell** (ataque onde a máquina da vítima se conecta ao computador do atacante, contornando firewalls que bloqueiam conexões de entrada, mas permitem as de saída).
-**Conexões Atípicas (Foreign Address)**: O processo `sh` (PID 3125) está conectado ao IP externo `45.79.12.11`. A porta local é alta (`44321`), indicando que indica que o servidor iniciou uma conexão de saída para entregar o controle ao invasor.
-**Uso de Recursos (Send-Q)**: Na última linha, o Send-Q está em `256`, indicando que já dados sendo enviados mas ainda não confirmados. Em um cenário de exfiltração, esse número costuma ficar alto e constante.
+**1. Escuta (LISTEN)**: Na linha do **PID 3122**, o comando `nc` (netcat) está abrindo a porta **6666**. Isso geralmente indica que alguém abriu uma brecha para entrar no sistema a qualquer momento.
+
+**2. Execução como Root**: Ao rodar com `sudo`, percebe-se que o processo 3125 é apenas um `sh` (shell). Um shell (`sh` ou `bash`) estabelecendo uma conexão de rede (`ESTABLISHED`) é um sinal clássico de **Reverse Shell** (ataque onde a máquina da vítima se conecta ao computador do atacante, contornando firewalls que bloqueiam conexões de entrada, mas permitem as de saída).
+
+**3. Conexões Atípicas (Foreign Address)**: O processo `sh` (PID 3125) está conectado ao IP externo `45.79.12.11`. A porta local é alta (`44321`), indicando que indica que o servidor iniciou uma conexão de saída para entregar o controle ao invasor.
+
+**4. Uso de Recursos (Send-Q)**: Na última linha, o Send-Q está em `256`, indicando que já dados sendo enviados mas ainda não confirmados. Em um cenário de exfiltração, esse número costuma ficar alto e constante.
 
 ##### Conclusão:
 Embora a porta 80 e 22 sejam serviços padrão, o conjunto da obra (**Netcat escutando + Shell conectado para fora**) indica que o servidor está comprometido. Mesmo que fosse um “teste” de um administrador preguiçoso, seria considerado uma **má prática grave** ou uma **sombra de TI (Shadow IT).**
 
 ## 📌 Comando
 
-### ss (socket statistics)
+### `ss` (socket statistics)
 
 #### O que faz
 Assim como o `netstat`, o `ss`, lista conexões de rede ativas e portas em escuta, incluindo o processo associado.
