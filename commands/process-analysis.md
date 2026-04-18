@@ -56,12 +56,17 @@ www-data  4321  0.1  0.5 120k   500k ?        S    11:00   0:00 /usr/sbin/apache
 #### Investigação de PID
 **A Coluna Command (O disfarce)**: 
 O processo `PID 1234` chama-se `[kworker/1:2]`. Processos entre colchetes `[ ]` geralmente são threads do kernel.
+
 **O Alerta**: Threads reais do kernel quase nunca consomem 98% de CPU por tanto tempo. Além disso, malwares costumam usar nomes entre colchetes para que o analista pense que é apenas o sistema operacional trabalhando.
+
 **A Coluna STAT (O estado)**:
 `S` significa *Sleep* (dormindo), `R` é *Running* (rodando). Se um processo está sempre em `R` com CPU alta, ele está executando cálculos intensos (como mineração de cripto ou criptografia de arquivos/Randomware).
-**Obs.:** `z` (Zombie): Se houver um processo com `STAT Z`, ele é um processo “Zumbi”. Ele já morreu, mas o processo pai não o removeu da tabela. Em um incidente, muitos processos zumbis podem indicar que um malware tentou rodar vários comandos que falharam ou foram bloqueados por uma ferramenta de segurança (alerta crítico para um analista!)
+
+- **Obs.:** `z` (Zombie): Se houver um processo com `STAT Z`, ele é um processo “Zumbi”. Ele já morreu, mas o processo pai não o removeu da tabela. Em um incidente, muitos processos zumbis podem indicar que um malware tentou rodar vários comandos que falharam ou foram bloqueados por uma ferramenta de segurança (alerta crítico para um analista!)
+
 **A Coluna USER (Privilégios)**:
 Se um processo suspeito está rodando como `root`, o perigo é máximo. Se for `www-data` (usuário do servidor web), pode ser um site vulnerável que foi invadido.
+
 
 ##### Dicas observadas durante o cenário:
 **Ordernar por CPU**: Para ver quem está “derretendo” o processador agora:
@@ -69,7 +74,9 @@ Se um processo suspeito está rodando como `root`, o perigo é máximo. Se for `
 ps aux –sort=-%cpu | head
 ```
 (O sinal de menos antes do `%cpu` coloca em ordem **decrescente**).
+
 **Ver a “árvore” de processos**: Às vezes o processo pai é o culpado. Use `ps faux` para ver quem chamou quem (a hierarquia).
+
 **Ordenar por RAM**: Enquanto ataques de **mineração de cripto** ou **ataques de força bruta** derretem o **%CPU**, outros tipos de ameaças preferem a **memória (%MEM)**:
 ```bash
 ps aux –sort=-%mem | head
@@ -77,12 +84,19 @@ ps aux –sort=-%mem | head
 Malware sem arquivo: alguns malwares rodam exclusivamente na memória RAM para não deixar rastros no disco rígido. Eles podem fazer o uso de memória subir de forma constante.
 Vazamento de Dados (Buffer Overflow): falhas em softwares legítimos que um atacante tenta explorar podem causar picos anormais de uso de memória antes do programa “crashar”.
 In-Memory Databases: às vezes, um banco de dados legítimo (como Redis) pode estar sendo abusado para armazenar dados roubados temporariamente antes da exfiltração.
+
 When you do ps aux, pay attention to:
+
 USER ✔️ 
+
 PID ✔️ 
+
 %CPU ✔️ 
+
 %MEM ✔️ 
+
 COMMAND ✔️ 
+
 
 ## 📌 Comandos
 
@@ -129,7 +143,9 @@ PID  USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
 
 #### Investigação
 **Nome do Comando**: `systemd-worker`. Parece um nome legítimo do sistema, mas o `systemd` real raramente usa esse nome exato para tarefas intensas de CPU.
+
 **%CPU em 99.8**: O processo está usando um núcleo inteiro sozinho de forma constante. Isso é comportamento clássico de um **Cryptojacker** (minerador de criptomoedas) escondido sob um nome falso.
+
 **TIME+**: O processo está rodando há mais de 45 minutos sem parar.
 
 #### Conclusão do Cenário
@@ -141,6 +157,7 @@ Foi identificado o PID `5567` como a causa da lentidão. O próximo passo lógic
 
 #### O que faz
 É um visualizador de processos interativo e em modo de texto para sistemas **Unix**. Oferece interface colorida, amigável e com suporte a mouse (se o terminal permitir).
+
 Monitora recursos do sistema em tempo real, mostrando o uso de cada **núcleo da CPU** individualmente, possui barras gráficas para memória e swap, e permite rolar a lista de processos horizontal e verticalmente.
 
 #### Uso em SOC
@@ -186,3 +203,5 @@ Monitorando um servidor web, percebe-se estar sofrendo uma lentidão intermitent
 ```
 
 #### Investigação
+
+[em progresso]
