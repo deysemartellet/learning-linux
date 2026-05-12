@@ -130,4 +130,42 @@ No Linux, o `stat` foca no acrônimo **MAC**:
 ## 🧪 Mini cenário: O Arquivo “Viajante do Tempo”
 
 
-[... a continuar]
+Encontrei um executável suspeito chamado `update_bin` em `/usr/bin`. O atacante é esperto e usou um comando para fazer o arquivo parecer ter sido criado há 2 anos.
+
+
+### Passos:
+
+
+1. Executar `stat /usr/bin/update_bin`
+2. Observo a seguinte saída:
+```
+  File: /usr/bin/update_bin
+  Size: 45600      Blocks: 96         IO Block: 4096   regular file
+Device: 801h/2049d Inode: 1572865     Links: 1
+Access: (0755/-rwxr-xr-x)  Uid: ( 0/ root)   Gid: ( 0/ root)
+Access: 2022-05-10 10:00:00.000000000 -0300
+Modify: 2022-05-10 10:00:00.000000000 -0300
+Change: 2024-10-25 15:30:22.456789123 -0300
+ Birth: -
+```
+
+#### Investigação dos arquivos
+
+
+1. **A Incoerência:** O **Access** e o **Modify** dizem “2022”. Parecem antigos e seguros, mas não são.
+
+2. **Change:** O selo **Change** mostra “2024-10-25”, porque enquanto um atacante pode facilmente alterar as datas de acesso e modificação com o comando `touch`, o selo **Change** é atualizado pelo kernel sempre que as permissões ou metadados mudam.
+
+3. O que podemos concluir é que alguém “trouxe” esse arquivo de fora ou alterou suas permissões hoje às 15:30. O arquivo é um intruso recente tentando se passar por antigo.
+
+
+#### Conclusão
+
+
+Ao encontrar essa discrepância no `stat`, o analista confirma que houve manipulação de linha do tempo (**Timestomping**).
+
+
+1. **Bloqueio:** O arquivo deve ser movido para análise.
+   
+2. **Timeline:** Agora sei o horário exato (`15:30:22`) para procurar nos logs o que mais aconteceu naquele segundo.
+
