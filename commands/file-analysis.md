@@ -169,6 +169,89 @@ Ao encontrar essa discrepância no `stat`, o analista confirma que houve manipul
    
 2. **Timeline:** Agora sei o horário exato (`15:30:22`) para procurar nos logs o que mais aconteceu naquele segundo.
 
+
+
+## 📌 Comando
+
+
+### ls -lat
+
+
+#### O que faz
+O `ls -lat` é o comando que transforma uma lista de arquivos bagunçada em uma **linha do tempo (timeline)** de eventos. Para um analista SOC, a ordem cronológica dos eventos altera totalmente a interpretação da investigação.
+É a combinação do comando `ls` (list) com três flags fundamentais que mudam a forma como os arquivos são exibidos e ordenados.
+
+
+#### Uso em SOC
+
+
+- **Contexto de Ataque:**. Descobrir um arquivo malicioso criado às 10:00, usar o `ls -lat` para ver **o que mais** foi criado ou alterado segundos antes ou depois. Isso revela os passos do invasor.
+
+
+- **Flagrar Arquivos Ocultos:** Malwares frequentemente usam nomes como `...` ou `.sys_update` para passar despercebidos pelo `ls` comum.
+
+
+- **Identificar “Picos” de Atividades:** Ver muitos arquivos alterados no mesmo segundo sugere uma ação automatizada (script) em vez de uma ação humana.
+
+
+#### Exemplo
+```bash
+ls - lat /tmp
+ls -latr
+```
+
+
+- `ls -lat /tmp`: Lista tudo em `/tmp`, dos mais recentes para os mais antigos, incluindo ocultos.
+  
+- `ls -latr`: O `-r` (reverse) inverte a ordem, deixando os arquivos mais recentes no **final** da lista (muito útil para não ter que rolar o terminal para cima).
+
+
+### O que cada flag faz
+
+
+- ##### `-l` (long): Formato de listagem longa. Mostra permissões, dono, grupo, tamanho e data.
+- ##### `-a` (all): Mostra arquivos ocultos (os que começam com um ponto `.`). Atacantes amam esconder malwares em arquivos como `.hidden_script`.
+- ##### `-t` (time): Ordena os arquivos pela **data de modificação**, colocando os mais recentes no topo.
+
+
+## 🧪 Mini cenário: A Pegada do Invasor
+Descobri com `find` que um arquivo chamado `shell.php` foi modificado recentemente em `/var/www/html/uploads`. Agora quero ver a cronologia do que aconteceu ao redor desse evento.
+
+
+### Passos:
+
+
+Navego até a pasta e executo `ls -lat`
+Observo o topo da lista:
+```
+drwxrwxrwx  2 www-data www-data  4096 Oct 25 15:35 .
+-rw-r--r--  1 www-data www-data   542 Oct 25 15:35 shell.php
+-rw-r--r--  1 www-data www-data  1205 Oct 25 15:34 .perfil_usuario.jpg
+-rw-r--r--  1 www-data www-data 85000 Oct 25 15:30 imagem_legitima.jpg
+drwxr-xr-x 10 root     root      4096 Oct 10 10:00 ..
+```
+
+
+#### Investigação dos arquivos
+
+
+1. **A Timeline:** Note que `shell.php` foi criado às **15:35**. Apenas um minuto antes (**15:34**), um arquivo “oculto” chamado `.perfil_usuario.jpg` foi criado.
+
+2. **O Disfarce:** O arquivo `.perfil_usuario.jpg` parece uma imagem, mas estar oculto e ter sido criado junto com um shell é suspeito. Provavelmente é um arquivo de dados ou um segundo estágio do malware.
+
+3. **A Pasta Atual (`.`)**: A data de modificação da pasta atual (`.`) também é 15:35, o que confirma que algo foi adicionado ou removido naquele exato momento.
+
+
+#### Conclusão e Remediação
+
+
+O `ls -lat` permitiu que visse que o ataque não foi apenas o `shell.php`. O arquivo `.perfil_usuario.jpg` também faz parte do incidente.
+
+
+- **Ação:** Analisar o conteúdo desse arquivo oculto (provavelmente ele não é uma imagem real).
+
+- **Timeline de Logs:** Agora tenho um intervalo de tempo exato (15:30 - 15:35) para filtrar os logs do servidor web e identificar o IP que fez esses uploads.
+
 ##
 
 - `ls -lat` = Ordem cronológica (Novos em cima) + Arquivos Ocultos + Detalhes técnicos.
