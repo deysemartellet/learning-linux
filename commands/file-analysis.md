@@ -14,7 +14,7 @@ Para análise de arquivos para SOC, vou aprofundar nos comandos `find`, `ls -lat
 
 **Por que isso é importante para o SOC?**
 
-Atacantes tentam se esconder (técnica de **Defense Evasion**). Eles podem dar nomes legítimos aos arquivos, mas é muito difícil falsificar perfeitamente todos os selos temporais e permissões sem deixar um rastro.
+Atacantes tentam se esconder (técnica de **Defense Evasion**). Eles podem dar nomes legítimos aos arquivos, mas é difícil alterar todos os metadados sem deixar inconsistências.
 
 A análise desses metadados é, muitas vezes, a única prova que temos de que algo foi violado.
 
@@ -97,11 +97,11 @@ Após confirmar que o arquivo `/var/www/html/assets/style.css.php` é um **Web S
 #### O que faz
 O `stat` (Status) é um comando que exibe informações detalhadas sobre o estado de um arquivo ou sistema de arquivos, focando especialmente nos seus **metadados** e selos temporais (timestamps).
 
-Ele extrai do sistema de arquivos informações que não são visíveis no conteúdo do arquivo, como o número **Inode** (o “RG” do arquivo no disco), o tamanho exato em blocos, o dono (UID), o grupo (GID) e os três selos temporais principais.
+Ele extrai do sistema de arquivos informações que não são visíveis no conteúdo do arquivo, como o número **Inode** (identificador único do arquivo no sistema de arquivos (como um “RG” do arquivo dentro do disco)), o tamanho exato em blocos, o dono (UID), o grupo (GID) e os três selos temporais principais.
 
 #### Uso em SOC
 
-- **Detecção de Timestomping:**. Atacantes tentam alterar as datas de um arquivo para que ele pareça antigo e legítimo. O `stat` mostra nanosegundos e o selo de “Change”, que é muito difícil de falsificar.
+- **Detecção de Timestomping:**. Atacantes tentam alterar as datas de um arquivo para que ele pareça antigo e legítimo. O `stat` mostra nanosegundos e o selo **Change** é gerenciado pelo kernel e tende a revelar alterações recentes mesmo quando **Access** e **Modify** foram manipulados.
 
 - **Rastreamento de Inode:** Se um arquivo foi deletado e um novo foi criado com o mesmo nome, o número do Inode no `stat` mudará, revelando a substituição.
 
