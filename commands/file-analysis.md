@@ -196,7 +196,7 @@ O `ls -lat` é o comando que transforma uma lista de arquivos bagunçada em uma 
 
 #### Exemplo
 ```bash
-ls - lat /tmp
+ls -lat /tmp
 ls -latr
 ```
 
@@ -221,8 +221,9 @@ Descobri com `find` que um arquivo chamado `shell.php` foi modificado recentemen
 ### Passos:
 
 
-Navego até a pasta e executo `ls -lat`
-Observo o topo da lista:
+1. Navego até a pasta e executo `ls -lat`
+   
+2. Observo o topo da lista:
 ```
 drwxrwxrwx  2 www-data www-data  4096 Oct 25 15:35 .
 -rw-r--r--  1 www-data www-data   542 Oct 25 15:35 shell.php
