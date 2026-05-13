@@ -169,3 +169,9 @@ Ao encontrar essa discrepância no `stat`, o analista confirma que houve manipul
    
 2. **Timeline:** Agora sei o horário exato (`15:30:22`) para procurar nos logs o que mais aconteceu naquele segundo.
 
+##
+
+- `ls -lat` = Ordem cronológica (Novos em cima) + Arquivos Ocultos + Detalhes técnicos.
+
+
+**Obs.:** Sempre olhar quem é o **Dono (Owner)**. Se um arquivo em uma pasta do `root` pertence ao usuário do servidor web (`www-data`), há algo errado.
